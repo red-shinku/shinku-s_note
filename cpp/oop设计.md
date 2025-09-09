@@ -197,6 +197,39 @@ $~~~~$`void f(int x = 2) override { std::cout << x; }`
 
 ## 2 访问控制与继承
 
+### 2.1 公有、私有和受保护继承
+
+还记得派生类继承列表中，每个基类前的访问说明符号吗？该**派生访问说明符**说明了从基类继承而来的成员在派生类中的最高访问权限。
+
+`class A {`  
+`public: int a;`  
+`protected: int b;`  
+`private: int c;`  
+`}`  
+`class Pub : public A {  `  
+`//a 在Pub中仍是public`  
+`//b 在Pub中仍是protected`  
+`//c 在Pub中仍是private`  
+`}`  
+`class Prot : protected A {`  
+`//a 在Prot中变为 protected`  
+`}`  
+`class Priv : private A {`  
+`//a 在Priv中变为private`  
+`//b 在priv中变为private`  
+`}`
+
+你可以看到，使用派生访问说明符，实际上不会对类内的成员访问造成影响，但对于类的实例（对象）来说，protected 和 private是不可访问的。
+
+`Prot test;`  
+`test.a //错误！a对对象不可见。`
+
+>public继承是最常用的继承方式，语义上是'is-a'; protected继承意味着仅限派生类内部可见，对象无法直接访问，常用于不希望外界直接拿基类接口。； private继承表示基类的接口对外部完全隐藏，常见于**实现复用**
+
+
+
+
+
 
 
 
