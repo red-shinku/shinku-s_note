@@ -10,10 +10,10 @@
 
 派生类通过**类派生列表**指明他从哪个类继承而来。具体写法：
 
-`class A { ... }`  
-`class B { ... }`  
+`class A { ... };`  
+`class B { ... };`  
 `//类C继承自A和B`  
-`class C : public A,  public B { ... }`
+`class C : public A,  public B { ... };`
 
 
 
@@ -30,7 +30,7 @@ c++支持**多继承**，即可以有多个基类，这相比Java的单继承多
 $~~~~$`virtual int getpower() { return power; }`  
 `protected:`  
 $~~~~$`int basic_power; `  
-`}`
+`};`
 
 在这个例子中，A的派生类可以根据自身的基础属性来得到不同倍数的power，通过**重写方法**。或许你还注意到了**protected**关键字，在protected域中的成员可以被其派生类访问，而不能被外部访问。
 
@@ -57,13 +57,13 @@ $~~~~$`int basic_power; `
 
 派生类需要使用基类的构造函数来初始化他的基类部分。
 
-`class A { ... }`  
+`class A { ... };`  
 `class B : public A { `  
 `public:`  
 $~~~~$`B(int n): A(...), number(n) {  }`  
 `private:`  
 $~~~~$`int number`  
-`}`
+`};`
 
 上面例子中显式使用了基类的构造函数。如果你不这么做的话，编译器会使用基类的默认构造函数，如果基类没有默认构造函数，就会报错。Java与这是一样的，Java使用super()来显式构造基类。而C++的多继承，则需要给出具体的构造函数名。
 
@@ -75,7 +75,7 @@ $~~~~$`int number`
 
 `class A {  `  
 `static num;`  
-`}`  
+`};`
 
 `A::num = 10;`
 
@@ -113,11 +113,11 @@ $~~~~$`int number`
 
 来看下面这个例子,Derived 继承了 Base:
 
-`struct Base { virtual void f(); }`  
+`struct Base { virtual void f(); };`  
 `struct Derived : public Base { `  
 $~~~~$`void f() override {  };`  
 $~~~~$`void g();`  
-`}`
+`};`
 
 `Base *pbase = new Derived();`
 
@@ -150,10 +150,10 @@ $~~~~$`void g();`
 
 `struct Base {`  
 $~~~~$`virtual void f(int x = 1) { std::cout << x; }`  
-`}`  
+`};`  
 `struct Derived : Base {`  
 $~~~~$`void f(int x = 2) override { std::cout << x; }`  
-`}`
+`};`
 
 `Derived p;`  
 `Based *pb = &d;`  
@@ -201,23 +201,25 @@ $~~~~$`void f(int x = 2) override { std::cout << x; }`
 
 还记得派生类继承列表中，每个基类前的访问说明符号吗？该**派生访问说明符**说明了从基类继承而来的成员在派生类中的最高访问权限。
 
+>struct默认public继承，class默认private继承。
+
 `class A {`  
 `public: int a;`  
 `protected: int b;`  
 `private: int c;`  
-`}`  
+`};`  
 `class Pub : public A {  `  
 `//a 在Pub中仍是public`  
 `//b 在Pub中仍是protected`  
 `//c 在Pub中仍是private`  
-`}`  
+`};`  
 `class Prot : protected A {`  
 `//a 在Prot中变为 protected`  
-`}`  
+`};`  
 `class Priv : private A {`  
 `//a 在Priv中变为private`  
 `//b 在priv中变为private`  
-`}`
+`};`
 
 你可以看到，使用派生访问说明符，实际上不会对类内的成员访问造成影响，但对于类的实例（对象）来说，protected 和 private是不可访问的。
 
@@ -226,7 +228,64 @@ $~~~~$`void f(int x = 2) override { std::cout << x; }`
 
 >public继承是最常用的继承方式，语义上是'is-a'; protected继承意味着仅限派生类内部可见，对象无法直接访问，常用于不希望外界直接拿基类接口。； private继承表示基类的接口对外部完全隐藏，常见于**实现复用**
 
+### 2.2 派生类向基类转换的可访问性
 
+**派生访问符**可以影响**向上转型**的可行范围（或者你可以提供更好更准确的描述），换个说法就是在不同层面向上转型的可访问性————派生类内部、派生类的派生类、外部代码。
+
+*      对于public继承，向上转型是公开可访问的。外部代码、派生类的派生类、派生类内部，都能进行转换。  
+*      对于protected继承，外部代码无法进行向上转型。派生类的派生类和派生类内部可以。  
+*      对于privated继承，只有派生类自己内部（或者友元）才可进行向上转型。
+
+`class B {  };`  
+`class D : protected B {`  
+$~~~~$`void foo() { B *p = this; } //在派生类自己内部可以转`  
+`};`  
+`class SubD : public D {`  
+$~~~~$`void ok() { B *p = this; } //在子类内部也可以转`  
+`};`  
+  
+`void outf(B* p) {  };`  
+
+`int main() {  `  
+$~~~~$`D d;`  
+$~~~~$`outf(&d); //错误！！在外部不可转`  
+`}`
+
+上面代码若是改为D私有继承B，则在SubD的内部就不允许`B *p = this;`了（函数名也从ok()改为buok()吧！）。
+
+>关于代码复用。对于public继承，是复用+"is a"的语义关系，用于抽象层次设计（哈基米是一种动物）。而protected继承只给自己和其后代类复用基类的实现，此派生类不希望外部将他随便当作基类看。对于private继承，这是纯粹的实现复用——只是借用了基类的功能，并没有"is a"的关系，在设计层面，private继承更接近**组合**，虽然语法上是继承。
+
+>在Java中，组合即在一个类中使用其他类的对象。
+
+### 2.3 友元与继承
+
+就像友元关系不能传递一样，友元关系也不能继承。派生类的友元不能随意访问基类的成员，基类的友元不能随意访问派生类的成员。
+
+>友元关系只对作出友元声明的类有效。记住！每个控制各自成员的访问权限。
+
+### 2.4 改变个别成员的可访问性
+
+有时我们需要改变派生类继承的某个名字（成员名）的访问级别。通过使用**using**声明达到这一目的。
+
+`class B {`  
+`public:`  
+$~~~~$`std::size_t size() const { return n; }`  
+`protected:`  
+$~~~~$`std::size_t n;`  
+`};`  
+`class D : private B {`  
+`public:`  
+$~~~~$`using B::size;`  
+`protected:`  
+$~~~~$`using B::n;`  
+`};`
+
+本来D使用了私有继承，所以size和n是其私有成员，外部和子类都不可访问。但是using改变了他们的可访问性，D的对象将可以使用size，但仍不能使用n；而D的子类将可以使用n。
+
+>using声明语句中名字的访问权限由该语句所在区域的访问说明符决定。效果相当于声明的名字免除了**派生访问说明符**的影响，其访问权限由区域**访问说明符**决定
+
+
+## 3 继承中的类作用域
 
 
 
