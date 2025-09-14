@@ -14,4 +14,3 @@ grades = [ int(x) for x in userinput.split(',') ]
 print(drop_first_last(grades))
 
 
-
