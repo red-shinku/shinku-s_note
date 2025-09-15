@@ -1,3 +1,5 @@
+ctrl + alt + t 打开终端
+
 vim [filename] : 打开并编辑文件。i进入输入模式，esc退回命令模式，：进入末行模式。
 	在末行模式下，w保存，w [新文件名]另存为，wq 保存退出，wq!强制（无权限写入用）
 			r [filename]将文件内容导入光标位置，!命令 执行系统命令，r!命令 执行系统命令并导入结果
@@ -16,6 +18,8 @@ rm : 删除文件
 cd : 进入文件夹， ..返回上层
 echo : 显示文本或变量的值
 export : 设置或显示环境变量，一般写在配置文件里面
+xdg-open : 打开pdf
+chsh : 更改终端
 
 ./configure : 检测平台环境，在使用的系统上准备软件的构建环境，生成Makefile
             configure是一个shell脚本文件，对于使用autotools的源码包，可用autoreconf -i来生成该脚本。
