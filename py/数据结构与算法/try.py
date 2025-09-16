@@ -39,10 +39,21 @@ def drop_first_last(grades):
 def avg(datas):
     return sum(datas) / len(datas)
 
+print("输入成绩们求平均：")
 userinput = input()
+
+#---------------------------------------------------------------
+
+numbers = [1, 2, 3, 2, 4, 5, 6, 7 ,5 ,7, 2, 4, 0]
 
 #列表推导式
 grades = [ int(x) for x in userinput.split(',') ]
 print(drop_first_last(grades))
 
+#生成器表达式
+gen_num = ( x for x in numbers if x > 5) #返回生成器对象，每次next输出大于5的数
+print('循环使用生成器输出： ')
+for x in gen_num:
+    print(x, end='  ')
 
+#---------------------------------------------------------------
