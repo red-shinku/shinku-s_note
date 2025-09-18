@@ -17,6 +17,9 @@ print(f'使用切片[2:4] { items[2: 4] }', end='\n')
 a = slice(2, 4)
 print(f'使用切片名a { items[a] }', end='\n')
 
+# 一般切片语法 [ start: stop: step ] 开始位置:结束位置:步长 
+# start:stop 区间左开右闭
+
 #---------------------------------------------------------------
 
 from collections import namedtuple # 为元组内每个元素命名
