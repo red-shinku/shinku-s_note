@@ -6,3 +6,5 @@ subprocess模块：
 chardet库：
     检测文件文本可能的编码或语言。
 
+unicodedata模块：
+    定义了包括unicode字符的名称、分类、数值、双向类别等属性。可以进行字符查询、转换和规范化操作。
