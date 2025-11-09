@@ -1,6 +1,9 @@
 #include <cstdint>
+#include <ostream>
 #include <tuple>
 #include <vector>
+#include <map>
+#include <string>
 #include <iostream>
 #include <optional>
 
@@ -18,26 +21,20 @@ namespace mat
 uint64_t Euclid(uint64_t a, uint64_t b)
 {
     if(b == 0) return a;
-    else Euclid(b, a % b);
+    else return Euclid(b, a % b);
 }
 
 //递归 计算线性方程（贝组等式）的系数 (ax + by = gcd(a, b))
-mat::Bezout_sult Euclid_extend(uint64_t a, uint64_t b, mat::Bezout_sult rst = std::make_tuple(0, 0, 0))
+mat::Bezout_sult Euclid_extend(uint64_t a, uint64_t b)
 {
     if(b == 0)
     {
-        std::get<0>(rst) = a;
-        std::get<1>(rst) = 1;
-        std::get<2>(rst) = 0;
+        return {a, 1, 0};
     }
     else
     {
-        rst = Euclid_extend(b, a % b, rst);
-        auto _x = std::get<1>(rst);
-        auto _y = std::get<2>(rst);
-        std::get<1>(rst) = _y;
-        std::get<2>(rst) = _x - (a / b) * _y;
-        return rst; 
+        auto [d, _x, _y] = Euclid_extend(b, a % b);
+        return {d, _y, _x - (a / b) * _y}; 
     }
 }
 
@@ -45,9 +42,9 @@ mat::Bezout_sult Euclid_extend(uint64_t a, uint64_t b, mat::Bezout_sult rst = st
 std::optional<mat::modLequa_sult> moduler_linear_equation_solver(uint64_t a, uint64_t b, uint64_t n)
 {
     mat::modLequa_sult result;
-    auto Bz_rst = Euclid_extend(a, b);
+    auto Bz_rst = Euclid_extend(a, n);
     auto d = std::get<0>(Bz_rst);
-    if(d % b == 0)
+    if(b % d == 0)
     {
         uint64_t x0 = std::get<1>(Bz_rst) * (b / d) % n;
         for(int i = 0; i <= d-1; ++i)
@@ -60,5 +57,24 @@ std::optional<mat::modLequa_sult> moduler_linear_equation_solver(uint64_t a, uin
     {
         return std::nullopt;       
     }
+}
+
+void showFunc()
+{
+    std::map<std::string, int> funcmap = {
+        {"greatest common divisor", 1},
+        {"solve Bezout", 2}, 
+        {"solve mod_line_equation", 3}
+    };
+    for(auto &[func, key]: funcmap)
+    {
+        std::cout << func << ": " << key << std::endl;
+    }
+    std::cout << "choose mode: "; 
+}
+
+int main()
+{
+    showFunc();
 }
 
