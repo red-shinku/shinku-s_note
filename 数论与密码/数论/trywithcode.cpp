@@ -8,7 +8,7 @@
 #include <optional>
 
 /**
- * Bezout_sult: 线性方程结果，<gcd(a,b), x, y>
+ * Bezout_sult: 线性方程结果，tuple<gcd(a,b), x, y>
  * modLequa_sult: 模线性方程结果, vector<uint64_t>
  */
 namespace mat
@@ -76,5 +76,10 @@ void showFunc()
 int main()
 {
     showFunc();
+    uint64_t a, b;
+    std::cin >> a >> b;
+    std::cout << Euclid(a, b) << std::endl;
+    auto rst = Euclid_extend(a, b); 
+    std::cout << std::get<0>(rst) << std::get<1>(rst) << std::get<2>(rst) << std::endl;
 }
 
