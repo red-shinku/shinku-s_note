@@ -9,23 +9,23 @@
 
 /**
  * Bezout_sult: 线性方程结果，tuple<gcd(a,b), x, y>
- * modLequa_sult: 模线性方程结果, vector<uint64_t>
+ * modLequa_sult: 模线性方程结果, vector<int64_t>
  */
 namespace mat
 {
-    using Bezout_sult = std::tuple<uint64_t, uint64_t, uint64_t>; 
-    using modLequa_sult = std::vector<uint64_t>;
+    using Bezout_sult = std::tuple<int64_t, int64_t, int64_t>; 
+    using modLequa_sult = std::vector<int64_t>;
 }
 
 //递归 欧几里得 (a > b)
-uint64_t Euclid(uint64_t a, uint64_t b)
+int64_t Euclid(int64_t a, int64_t b)
 {
     if(b == 0) return a;
     else return Euclid(b, a % b);
 }
 
 //递归 计算线性方程（贝组等式）的系数 (ax + by = gcd(a, b))
-mat::Bezout_sult Euclid_extend(uint64_t a, uint64_t b)
+mat::Bezout_sult Euclid_extend(int64_t a, int64_t b)
 {
     if(b == 0)
     {
@@ -39,14 +39,14 @@ mat::Bezout_sult Euclid_extend(uint64_t a, uint64_t b)
 }
 
 //求模线性方程的解
-std::optional<mat::modLequa_sult> moduler_linear_equation_solver(uint64_t a, uint64_t b, uint64_t n)
+std::optional<mat::modLequa_sult> moduler_linear_equation_solver(int64_t a, int64_t b, int64_t n)
 {
     mat::modLequa_sult result;
     auto Bz_rst = Euclid_extend(a, n);
     auto d = std::get<0>(Bz_rst);
     if(b % d == 0)
     {
-        uint64_t x0 = std::get<1>(Bz_rst) * (b / d) % n;
+        int64_t x0 = std::get<1>(Bz_rst) * (b / d) % n;
         for(int i = 0; i <= d-1; ++i)
         {
             result.push_back(x0 + i * (n / d));
@@ -76,10 +76,17 @@ void showFunc()
 int main()
 {
     showFunc();
-    uint64_t a, b;
-    std::cin >> a >> b;
-    std::cout << Euclid(a, b) << std::endl;
-    auto rst = Euclid_extend(a, b); 
-    std::cout << std::get<0>(rst) << std::get<1>(rst) << std::get<2>(rst) << std::endl;
+    int64_t a, b, n;
+    std::cin >> a >> b >> n;
+    auto rst = moduler_linear_equation_solver(a, b, n);
+    if(rst.has_value() == false)
+    {
+        return 0;
+    }
+    for(auto sult: *rst)
+    {
+        std::cout << sult << " ";
+    }
+    std::cout << std::endl;
 }
 
