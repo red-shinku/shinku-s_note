@@ -1,11 +1,11 @@
 #include <cstdint>
-#include <ostream>
 #include <tuple>
 #include <vector>
 #include <map>
 #include <string>
 #include <iostream>
 #include <optional>
+#include <functional>
 
 /**
  * Bezout_sult: 线性方程结果，tuple<gcd(a,b), x, y>
@@ -46,10 +46,11 @@ std::optional<mat::modLequa_sult> moduler_linear_equation_solver(int64_t a, int6
     auto d = std::get<0>(Bz_rst);
     if(b % d == 0)
     {
-        int64_t x0 = std::get<1>(Bz_rst) * (b / d) % n;
+        auto mod = [](int64_t x, int64_t n) { return (x % n + n) % n; };
+        int64_t x0 = mod(std::get<1>(Bz_rst) * (b / d), n);
         for(int i = 0; i <= d-1; ++i)
         {
-            result.push_back(x0 + i * (n / d));
+            result.push_back((x0 + i * (n / d)) % n);
         }
         return result;
     }
@@ -59,34 +60,122 @@ std::optional<mat::modLequa_sult> moduler_linear_equation_solver(int64_t a, int6
     }
 }
 
+//求总有效位数
+int effective_bits(uint64_t x)
+{
+    if(x == 0) return 0;
+    else return 64 - __builtin_clzll(x);
+}
+
+//求模取幂(a的b次方mod n， a、b为非负整数， n为正整数)
+uint64_t moduler_exponentiation(uint64_t a, uint64_t b, uint64_t n)
+{
+    if(n == 1) return 0;
+    uint64_t rst = 1;
+    for(int i = effective_bits(b) - 1; i >= 0; --i)
+    {
+        rst = (rst * rst) % n;
+        auto nowbit_in_b = b >> i & 1ULL;
+        if(nowbit_in_b == 1)
+        {
+            rst = (rst * a) % n;
+        }
+    }
+    return rst;
+}
+
+void call_Euclid()
+{
+    int64_t a, b;
+    std::cin >> a >> b;
+    std::cout << Euclid(a, b) << std::endl;
+}
+
+void call_Euclid_extend()
+{
+    int64_t a, b; 
+    std::cin >> a >> b;
+    auto [d, x, y] = Euclid_extend(a, b);
+    std::cout << "ax + by = gcd(a, b)" << "   "
+        << "x: " << x << " " 
+        << "y: " << y << " "
+        << "gcd(a, b): " << d << std::endl;
+}
+
+void call_moduler_linear_equation_solver()
+{
+    int64_t a, b, n;
+    std::cin >> a >> b >> n;
+    auto results = moduler_linear_equation_solver(a, b, n);
+    if(results == std::nullopt)
+    {
+        std::cout << "no result" << std::endl;
+    }
+    else 
+    {
+        for(auto result: results.value())
+        {
+            std::cout << result << " " ; 
+        }
+        std::cout << std::endl;
+    }
+}
+
+void call_moduler_exponentiation()
+{
+    uint64_t a, b, n;
+    std::cin >> a >> b >> n;
+    std::cout << moduler_exponentiation(a, b, n) << std::endl;
+}
+
+void die()
+{
+    exit(1);
+}
+
 void showFunc()
 {
-    std::map<std::string, int> funcmap = {
-        {"greatest common divisor", 1},
-        {"solve Bezout", 2}, 
-        {"solve mod_line_equation", 3}
+    std::map<std::string, std::string> funcmap = {
+        {"call Euclid", "euclid"},
+        {"solve Bezout", "bezout"}, 
+        {"solve moduler_line_equation", "mdlneq"},
+        {"solve moduler_exponentiation", "mdexp"},
+        {"show usable function", "showfunc"},
+        {"end process", "die"}
     };
     for(auto &[func, key]: funcmap)
     {
         std::cout << func << ": " << key << std::endl;
     }
-    std::cout << "choose mode: "; 
+}
+
+void callFunc()
+{
+    std::map<std::string, std::function<void()>> dofunc = {
+        {"euclid", call_Euclid},
+        {"bezout", call_Euclid_extend},
+        {"mdlneq", call_moduler_linear_equation_solver},
+        {"mdexp", call_moduler_exponentiation},
+        {"die", die},
+        {"showfunc", showFunc}
+    };
+    std::string name;
+    std::cin >> name;
+    if(dofunc.count(name) == 0)
+    {
+        std::cout << "no such function" << std::endl;
+        return;
+    }
+    auto func = dofunc.at(name);
+    func();
 }
 
 int main()
 {
     showFunc();
-    int64_t a, b, n;
-    std::cin >> a >> b >> n;
-    auto rst = moduler_linear_equation_solver(a, b, n);
-    if(rst.has_value() == false)
+    while(true)
     {
-        return 0;
+        callFunc();
     }
-    for(auto sult: *rst)
-    {
-        std::cout << sult << " ";
-    }
-    std::cout << std::endl;
 }
 
