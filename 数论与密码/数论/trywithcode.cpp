@@ -118,7 +118,7 @@ void die()
 
 void showFunc()
 {
-    std::map<std::string, std::string> funcmap = {
+    static std::map<std::string, std::string> funcmap = {
         {"call Euclid", "euclid"},
         {"solve Bezout", "bezout"}, 
         {"solve moduler_line_equation", "mdlneq"},
@@ -134,7 +134,7 @@ void showFunc()
 
 void callFunc()
 {
-    std::map<std::string, std::function<void()>> dofunc = {
+    static std::map<std::string, std::function<void()>> dofunc = {
         {"euclid", call_Euclid},
         {"bezout", call_Euclid_extend},
         {"mdlneq", call_moduler_linear_equation_solver},
